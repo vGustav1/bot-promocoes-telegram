@@ -239,12 +239,16 @@ async def postar_proxima(context: ContextTypes.DEFAULT_TYPE):
         oferta["nome"], oferta["preco_antigo"], oferta["preco_promo"], oferta["link"]
     )
 
-    await context.bot.send_photo(
-        chat_id=CANAL,
-        photo=oferta["imagem"],
-        caption=legenda,
-        parse_mode="HTML"
-    )
+    try:
+        await context.bot.send_photo(
+            chat_id=CANAL,
+            photo=oferta["imagem"],
+            caption=legenda,
+            parse_mode="HTML"
+        )
+    except Exception as erro:
+        print(f"[ERRO] Falha ao postar oferta '{oferta['nome']}' no canal: {erro}")
+        # mesmo com erro, avança o índice para não travar sempre na mesma oferta quebrada
 
     indice_atual = (indice_atual + 1) % len(ofertas_ativas)
     salvar_indice()
@@ -272,7 +276,11 @@ async def verificar_ofertas_antigas(context: ContextTypes.DEFAULT_TYPE):
         texto += f"{numero}. {nome} — há {dias} dia(s)\n"
     texto += "\nUse /removeroferta NUMERO para tirar do rodízio quem já não vale mais."
 
-    await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=texto)
+    try:
+        await context.bot.send_message(chat_id=ADMIN_CHAT_ID, text=texto)
+    except Exception as erro:
+        print(f"[ERRO] Falha ao enviar alerta de ofertas antigas para ADMIN_CHAT_ID: {erro}")
+        print("Verifique se ADMIN_CHAT_ID no .env/Variables está com o chat_id correto (obtido via /start).")
 
 
 def main():
