@@ -1,0 +1,23 @@
+
+.env
+
+# Ambiente virtual Python
+venv/
+env/
+ENV/
+
+# Cache do Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Arquivos de configuração de IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Dados persistidos do bot (específicos de cada instalação)
+ofertas.json
+estado.json
