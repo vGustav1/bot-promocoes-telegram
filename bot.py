@@ -26,8 +26,9 @@ if not TOKEN or not CANAL:
         "TELEGRAM_BOT_TOKEN e TELEGRAM_CANAL precisam estar definidos no arquivo .env"
     )
 
-ARQUIVO_OFERTAS = "ofertas.json"
-ARQUIVO_ESTADO = "estado.json"
+DIRETORIO_DADOS = os.getenv("DIRETORIO_DADOS", ".")
+ARQUIVO_OFERTAS = os.path.join(DIRETORIO_DADOS, "ofertas.json")
+ARQUIVO_ESTADO = os.path.join(DIRETORIO_DADOS, "estado.json")
 
 NOME, PRECO_ANTIGO, PRECO_PROMO, LINK, IMAGEM = range(5)
 
