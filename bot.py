@@ -18,8 +18,8 @@ load_dotenv()
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CANAL = os.getenv("TELEGRAM_CANAL")
 INTERVALO_SEGUNDOS = int(os.getenv("INTERVALO_SEGUNDOS", "300"))
-ADMIN_CHAT_ID = os.getenv("ADMIN_CHAT_ID")  # seu ID pessoal, pra receber os alertas
-DIAS_ALERTA = int(os.getenv("DIAS_ALERTA", "3"))  # a partir de quantos dias avisar
+ADMIN_CHAT_ID = os.getenv("ADMIN_CHAT_ID") 
+DIAS_ALERTA = int(os.getenv("DIAS_ALERTA", "3"))  # a partir de quantos dias avisar para verificar se a promocao esta ativa
 
 if not TOKEN or not CANAL:
     raise ValueError(
@@ -32,7 +32,7 @@ ARQUIVO_ESTADO = os.path.join(DIRETORIO_DADOS, "estado.json")
 
 NOME, PRECO_ANTIGO, PRECO_PROMO, LINK, IMAGEM = range(5)
 
-# ---------- Persistência: carregar e salvar em arquivo ----------
+# ---------- carregar e salvar em arquivo ----------
 
 def carregar_ofertas():
     if os.path.exists(ARQUIVO_OFERTAS):
@@ -57,7 +57,7 @@ def salvar_indice():
 ofertas_ativas = carregar_ofertas()
 indice_atual = carregar_indice()
 
-# ---------- Comandos básicos ----------
+# ---------- comandos básicos do bot ----------
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
@@ -180,7 +180,7 @@ async def addofertas(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"{adicionadas} oferta(s) adicionada(s)! ({len(ofertas_ativas)} ativas no total)"
     )
 
-# ---------- /novaoferta (passo a passo, via conversa) ----------
+# ---------- /novaoferta (passo a passo com o bot te fazendo as perguntas) ----------
 
 async def novaoferta(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Vamos criar uma nova oferta!\n\nQual o nome do produto?")
@@ -224,7 +224,7 @@ async def cancelar(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Cadastro de oferta cancelado.")
     return ConversationHandler.END
 
-# ---------- Job automático: roda em loop pelas ofertas ativas ----------
+# ---------- passa pela lista de produtos ----------
 
 async def postar_proxima(context: ContextTypes.DEFAULT_TYPE):
     global indice_atual
@@ -249,12 +249,12 @@ async def postar_proxima(context: ContextTypes.DEFAULT_TYPE):
         )
     except Exception as erro:
         print(f"[ERRO] Falha ao postar oferta '{oferta['nome']}' no canal: {erro}")
-        # mesmo com erro, avança o índice para não travar sempre na mesma oferta quebrada
+        # se der erro, continua para a lista nao parar
 
     indice_atual = (indice_atual + 1) % len(ofertas_ativas)
     salvar_indice()
 
-# ---------- Job automático: alerta diário de ofertas antigas ----------
+# ---------- alerta diário de ofertas antigas ----------
 
 async def verificar_ofertas_antigas(context: ContextTypes.DEFAULT_TYPE):
     if not ADMIN_CHAT_ID:
